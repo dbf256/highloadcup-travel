@@ -382,26 +382,13 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
     private void addHeaders(FullHttpResponse response) {
         response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=UTF-8");
         response.headers().setInt(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
-        response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.CLOSE);
+        response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
     }
 
     private void writeCode(HttpResponseStatus status, ChannelHandlerContext ctx) {
-        // boolean keepAlive = HttpUtil.isKeepAlive(request);
-        // Build the response object.
         FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, status, EMPTY_BUFF);
         addHeaders(response);
-
-
-        // if (keepAlive) {
-            // Add 'Content-Length' header only for a keep-alive connection.
-            // response.headers().setInt(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
-            // Add keep alive header as per:
-            // - http://www.w3.org/Protocols/HTTP/1.1/draft-ietf-http-v11-spec-01.html#Connection
-            //response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
-        //}
-
-        // Write the response.
-        ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+        ctx.writeAndFlush(response);
     }
 
     private void writeResult(HttpResponseStatus status, StringBuilder buffer, ChannelHandlerContext ctx) {
@@ -409,28 +396,10 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
     }
 
     private void writeResult(HttpResponseStatus status, ByteBuf buffer, ChannelHandlerContext ctx) {
-        boolean keepAlive = false; //HttpUtil.isKeepAlive(request);
-        // Build the response object.
         FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, status, buffer);
         addHeaders(response);
-        //response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/json; charset=UTF-8");
-
-        //if (keepAlive) {
-            // Add 'Content-Length' header only for a keep-alive connection.
-            //response.headers().setInt(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
-            // Add keep alive header as per:
-            // - http://www.w3.org/Protocols/HTTP/1.1/draft-ietf-http-v11-spec-01.html#Connection
-        //    response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
-        //}
-
-        // Write the response.
-        ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
-    }
-
-
-    private static void send100Continue(ChannelHandlerContext ctx) {
-        FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, CONTINUE);
-        ctx.write(response);
+        response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
+        ctx.writeAndFlush(response);
     }
 
     @Override
