@@ -21,7 +21,7 @@ public class Reader {
         File[] filesList = new File(path).listFiles();
 
         for(File f : filesList){
-            if(f.isFile()){
+            if(f.isFile() && f.getAbsolutePath().endsWith("json")){
                 String content = Files.readAllLines(Paths.get(f.getAbsolutePath()), StandardCharsets.UTF_8).stream().collect(Collectors.joining(""));
                 System.out.println("Reading " + f.getAbsolutePath());
                 JsonParser parser = new JsonParser();

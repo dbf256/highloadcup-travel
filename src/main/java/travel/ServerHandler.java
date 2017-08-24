@@ -248,6 +248,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
             }
         } catch (IllegalArgumentException e) {
             writeCode(HttpResponseStatus.BAD_REQUEST, ctx);
+            return;
         }
         try {
             Double average = Main.storage.locationAverage(location.id, fromDate, toDate, fromAge, toAge, gender != null ? gender.charAt(0) : null);
