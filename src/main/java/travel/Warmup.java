@@ -1,30 +1,39 @@
 package travel;
 
 
+import org.apache.http.client.fluent.Request;
+import org.apache.http.entity.ContentType;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Warmup {
 
-    private Storage storage;
+    public Warmup() {
 
-    public Warmup(Storage storage) {
-        this.storage = storage;
     }
 
     public void warmup() {
 
         List<Object> objects = new ArrayList<>();
+        long start = System.currentTimeMillis();
         for (int i = 0; i < 1000; i++) {
             try {
-                objects.add(storage.getUser(i));
-                objects.add(storage.getLocation(i));
-                objects.add(storage.getVisit(i));
-                objects.add(storage.locationAverage(i, Long.MIN_VALUE, Long.MAX_VALUE, Long.MIN_VALUE, Long.MAX_VALUE, 'm'));
-                objects.add(storage.userVisits(i, Long.MIN_VALUE, Long.MAX_VALUE, Long.MAX_VALUE, storage.getLocation(i).country));
+                objects.add(Request.Get("http://localhost/users/" + i).execute().returnContent());
+                objects.add(Request.Get("http://localhost/locations/" + i).execute().returnContent());
+                objects.add(Request.Get("http://localhost/visits/" + i).execute().returnContent());
+                objects.add(Request.Get("http://localhost/locations/" + i + "/avg").execute().returnContent());
+                objects.add(Request.Get("http://localhost/users/" + i + "/visits").execute().returnContent());
+                objects.add(Request.Get("http://localhost/users/" + i + "/visits").execute().returnContent());
+                objects.add(Request.Post("http://localhost/users/" + i).bodyString("", ContentType.APPLICATION_JSON).execute().returnContent());
+                objects.add(Request.Post("http://localhost/users/new").bodyString("", ContentType.APPLICATION_JSON).execute().returnContent());
+                objects.add(Request.Post("http://localhost/visits/" + i).bodyString("", ContentType.APPLICATION_JSON).execute().returnContent());
+                objects.add(Request.Post("http://localhost/visits/new").bodyString("", ContentType.APPLICATION_JSON).execute().returnContent());
+                objects.add(Request.Post("http://localhost/locations/" + i).bodyString("", ContentType.APPLICATION_JSON).execute().returnContent());
+                objects.add(Request.Post("http://localhost/locations/new").bodyString("", ContentType.APPLICATION_JSON).execute().returnContent());
             } catch (Exception ignore) {}
         }
-        System.out.println("Warmup: " + objects.size());
+        System.out.println("Warmup: " + objects.size() + " in " + (System.currentTimeMillis() - start));
         objects = null;
         System.gc();
 

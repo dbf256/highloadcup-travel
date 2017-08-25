@@ -46,6 +46,7 @@ public class Main {
                     .childHandler(new ServerInitializer());
             System.out.println("Started");
             Channel ch = b.bind(port).sync().channel();
+            new Warmup().warmup();
             ch.closeFuture().sync();
         } finally {
             bossGroup.shutdownGracefully();
@@ -59,8 +60,6 @@ public class Main {
 
         new Reader().readData(storage);
         //Handler handler = new Handler(storage);
-        new Warmup(storage).warmup();
-        
         new Main(80).run();
     }
 
