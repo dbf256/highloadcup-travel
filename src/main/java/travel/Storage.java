@@ -7,6 +7,8 @@ import travel.model.Visit;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static travel.model.Constants.INT_FIELD_MISSING;
 import static travel.model.Constants.LONG_FIELD_MISSING;
@@ -15,8 +17,14 @@ class Storage {
     public final Map<Long, User> users = new ConcurrentHashMap<>();
     public final Map<Long, Location> locations = new ConcurrentHashMap<>();
     public final Map<Long, Visit> visits = new ConcurrentHashMap<>();
-    public final Map<Long, Set<Long>> visitsByUser = new ConcurrentHashMap<>();
-    public final Map<Long, Set<Long>> visitsByLocation = new ConcurrentHashMap<>();
+    public final Map<Long, Set<Visit>> visitsByUser = new ConcurrentHashMap<>();
+    public final Map<Long, Set<Visit>> visitsByLocation = new ConcurrentHashMap<>();
+
+    public final AtomicInteger requestsCount = new AtomicInteger();
+    public final AtomicBoolean firstStageGc = new AtomicBoolean(false);
+    public final AtomicBoolean secondStageGc = new AtomicBoolean(false);
+    public final AtomicBoolean gcTracker = new AtomicBoolean(false);
+
 
     public void clear() {
         users.clear();
@@ -25,6 +33,15 @@ class Storage {
         visitsByUser.clear();
         visitsByLocation.clear();
     }
+
+    public void resetRequestsCounter() {
+        requestsCount.set(0);
+    }
+
+    public void incrementRequests() {
+        requestsCount.incrementAndGet();
+    }
+
 
     public void insert(User user) {
         users.put(user.id, user);
@@ -84,34 +101,38 @@ class Storage {
     }
 
     private void addLocationVisit(long visitId, long locationId) {
-        Set<Long> byLocation = visitsByLocation.get(locationId);
+        Visit visit = visits.get(visitId);
+        Set<Visit> byLocation = visitsByLocation.get(locationId);
         if (byLocation == null) {
             byLocation = new HashSet<>();
             visitsByLocation.put(locationId, byLocation);
         }
-        byLocation.add(visitId);
+        byLocation.add(visit);
     }
 
     private void addUserVisit(long visitId, long userId) {
-        Set<Long> byUser = visitsByUser.get(userId);
+        Visit visit = visits.get(visitId);
+        Set<Visit> byUser = visitsByUser.get(userId);
         if (byUser == null) {
             byUser = new HashSet<>();
             visitsByUser.put(userId, byUser);
         }
-        byUser.add(visitId);
+        byUser.add(visit);
     }
 
     private void deleteLocationVisit(long visitId, long locationId) {
-        Set<Long> byLocation = visitsByLocation.get(locationId);
+        Visit visit = visits.get(visitId);
+        Set<Visit> byLocation = visitsByLocation.get(locationId);
         if (byLocation != null) {
-            byLocation.remove(visitId);
+            byLocation.remove(visit);
         }
     }
 
     private void deleteUserVisit(long visitId, long userId) {
-        Set<Long> byUser = visitsByUser.get(userId);
+        Visit visit = visits.get(visitId);
+        Set<Visit> byUser = visitsByUser.get(userId);
         if (byUser != null) {
-            byUser.remove(visitId);
+            byUser.remove(visit);
         }
     }
 
@@ -188,8 +209,8 @@ class Storage {
 
         long sum = 0;
         double num = 0;
-        for (Long visitId : visitsByLocation.getOrDefault(locationId, Collections.emptySet())) {
-            Visit visit = visits.get(visitId);
+        for (Visit visit : visitsByLocation.getOrDefault(locationId, Collections.emptySet())) {
+            //Visit visit = visits.get(visitId);
             if (fromDate != null && visit.visited <= fromDate) {
                 continue;
             }
@@ -220,10 +241,10 @@ class Storage {
         }
     }
 
-    public List<UserVisit> userVisits(long userId,  Long fromDate, Long toDate, Long toDistance, String country) {
-        List<UserVisit> userVisits = new ArrayList<>();
-        for (Long visitId : visitsByUser.getOrDefault(userId, Collections.emptySet())) {
-            Visit visit = visits.get(visitId);
+    public List<Visit> userVisits(long userId,  Long fromDate, Long toDate, Long toDistance, String country) {
+        List<Visit> userVisits = new ArrayList<>();
+        for (Visit visit : visitsByUser.getOrDefault(userId, Collections.emptySet())) {
+            //Visit visit = visits.get(visitId);
             if (toDate != null && visit.visited >= toDate) {
                 continue;
             }
@@ -241,7 +262,7 @@ class Storage {
                     continue;
                 }
             }
-            userVisits.add(new UserVisit(visit.mark, visit.visited, location.place));
+            userVisits.add(visit);
         }
         userVisits.sort((v1, v2) -> v1.visited > v2.visited ? 1 : -1);
         return userVisits;

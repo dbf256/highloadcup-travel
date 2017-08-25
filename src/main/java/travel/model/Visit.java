@@ -38,6 +38,7 @@ public class Visit {
         return object;
     }
 
+    /*
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -54,4 +55,5 @@ public class Visit {
     public int hashCode() {
         return Objects.hash(id, user, location, visited, mark);
     }
+    */
 }

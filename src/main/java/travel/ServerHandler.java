@@ -301,12 +301,12 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
             return;
         }
         try {
-            List<UserVisit> visits = Main.storage.userVisits(user.id, fromDate, toDate, toDistance, country);
-            ByteBuf buf = Unpooled.buffer(BUF_SIZE);
+            List<Visit> visits = Main.storage.userVisits(user.id, fromDate, toDate, toDistance, country);
+            ByteBuf buf = Unpooled.buffer(BUF_SIZE * visits.size());
             buf.writeBytes("{\"visits\":[".getBytes(CharsetUtil.UTF_8));
             for (int i = 0; i < visits.size(); i++) {
-                UserVisit visit = visits.get(i);
-                writeUserVisit(visit, buf);
+                Visit visit = visits.get(i);
+                writeUserVisit(visit, Main.storage.locations.get(visit.location).place, buf);
                 if (i != visits.size() - 1) {
                     buf.writeBytes(",".getBytes(CharsetUtil.UTF_8));
                 }
@@ -389,18 +389,14 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
     private void writeCode(HttpResponseStatus status, ChannelHandlerContext ctx) {
         FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, status, EMPTY_BUFF);
         addHeaders(response);
-        ctx.writeAndFlush(response);
-    }
-
-    private void writeResult(HttpResponseStatus status, StringBuilder buffer, ChannelHandlerContext ctx) {
-        writeResult(status, Unpooled.copiedBuffer(buffer.toString(), CharsetUtil.UTF_8), ctx);
+        ctx.write(response);
     }
 
     private void writeResult(HttpResponseStatus status, ByteBuf buffer, ChannelHandlerContext ctx) {
         FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, status, buffer);
         addHeaders(response);
         response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
-        ctx.writeAndFlush(response);
+        ctx.write(response);
     }
 
     @Override
@@ -409,58 +405,80 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
         ctx.close();
     }
 
-    private void writeUserVisit(UserVisit visit, ByteBuf buf) {
-        buf.writeBytes(BYTES_USER_VISIT_MARK);
-        buf.writeBytes(String.valueOf(visit.mark).getBytes(CharsetUtil.UTF_8));
-        buf.writeBytes(BYTES_USER_VISIT_VISITED_AT);
-        buf.writeBytes(String.valueOf(visit.visited).getBytes(CharsetUtil.UTF_8));
-        buf.writeBytes(BYTES_USER_VISIT_PLACE);
-        buf.writeBytes(visit.place.getBytes(CharsetUtil.UTF_8));
-        buf.writeBytes(BYTES_USER_VISIT_END);
+    private void writeUserVisit(Visit visit, String place, ByteBuf buf) {
+        //buf.writeBytes(BYTES_USER_VISIT_MARK);
+        //buf.writeBytes(String.valueOf(visit.mark).getBytes(CharsetUtil.UTF_8));
+        //buf.writeBytes(BYTES_USER_VISIT_VISITED_AT);
+        //buf.writeBytes(String.valueOf(visit.visited).getBytes(CharsetUtil.UTF_8));
+        //buf.writeBytes(BYTES_USER_VISIT_PLACE);
+        //buf.writeBytes(visit.place.getBytes(CharsetUtil.UTF_8));
+        //buf.writeBytes(BYTES_USER_VISIT_END);
+        buf.writeBytes(
+                ("{\"mark\":" + visit.mark + ",\"visited_at\":" + visit.visited + ",\"place\":\"" + place + "\"}").getBytes(CharsetUtil.UTF_8)
+        );
     }
 
     private void writeVisit(Visit visit, ByteBuf buf) {
-        buf.writeBytes(BYTES_VISIT_ID);
-        buf.writeBytes(String.valueOf(visit.id).getBytes(CharsetUtil.UTF_8));
-        buf.writeBytes(BYTES_VISIT_LOCATION);
-        buf.writeBytes(String.valueOf(visit.location).getBytes(CharsetUtil.UTF_8));
-        buf.writeBytes(BYTES_VISIT_MARK);
-        buf.writeBytes(String.valueOf(visit.mark).getBytes(CharsetUtil.UTF_8));
-        buf.writeBytes(BYTES_VISIT_USER);
-        buf.writeBytes(String.valueOf(visit.user).getBytes(CharsetUtil.UTF_8));
-        buf.writeBytes(BYTES_VISIT_VISITED_AT);
-        buf.writeBytes(String.valueOf(visit.visited).getBytes(CharsetUtil.UTF_8));
-        buf.writeBytes(BYTES_VISIT_END);
+//        buf.writeBytes(BYTES_VISIT_ID);
+//        buf.writeBytes(String.valueOf(visit.id).getBytes(CharsetUtil.UTF_8));
+//        buf.writeBytes(BYTES_VISIT_LOCATION);
+//        buf.writeBytes(String.valueOf(visit.location).getBytes(CharsetUtil.UTF_8));
+//        buf.writeBytes(BYTES_VISIT_MARK);
+//        buf.writeBytes(String.valueOf(visit.mark).getBytes(CharsetUtil.UTF_8));
+//        buf.writeBytes(BYTES_VISIT_USER);
+//        buf.writeBytes(String.valueOf(visit.user).getBytes(CharsetUtil.UTF_8));
+//        buf.writeBytes(BYTES_VISIT_VISITED_AT);
+//        buf.writeBytes(String.valueOf(visit.visited).getBytes(CharsetUtil.UTF_8));
+//        buf.writeBytes(BYTES_VISIT_END);
+
+        buf.writeBytes(
+                ("{\"id\":" + visit.id + ",\"location\":" + visit.location + ",\"mark\":" + visit.mark + ",\"user\":" + visit.user +
+                        ",\"visited_at\":" + visit.visited + "}"
+                ).getBytes(CharsetUtil.UTF_8)
+        );
+        
     }
 
     private void writeLocation(Location location, ByteBuf buf) {
-        buf.writeBytes(BYTES_LOCATION_ID);
-        buf.writeBytes(String.valueOf(location.id).getBytes(CharsetUtil.UTF_8));
-        buf.writeBytes(BYTES_LOCATION_PLACE);
-        buf.writeBytes(String.valueOf(location.place).getBytes(CharsetUtil.UTF_8));
-        buf.writeBytes(BYTES_LOCATION_COUNTRY);
-        buf.writeBytes(String.valueOf(location.country).getBytes(CharsetUtil.UTF_8));
-        buf.writeBytes(BYTES_LOCATION_CITY);
-        buf.writeBytes(String.valueOf(location.city).getBytes(CharsetUtil.UTF_8));
-        buf.writeBytes(BYTES_LOCATION_DISTANCE);
-        buf.writeBytes(String.valueOf(location.distance).getBytes(CharsetUtil.UTF_8));
-        buf.writeBytes(BYTES_LOCATION_END);
+//        buf.writeBytes(BYTES_LOCATION_ID);
+//        buf.writeBytes(String.valueOf(location.id).getBytes(CharsetUtil.UTF_8));
+//        buf.writeBytes(BYTES_LOCATION_PLACE);
+//        buf.writeBytes(String.valueOf(location.place).getBytes(CharsetUtil.UTF_8));
+//        buf.writeBytes(BYTES_LOCATION_COUNTRY);
+//        buf.writeBytes(String.valueOf(location.country).getBytes(CharsetUtil.UTF_8));
+//        buf.writeBytes(BYTES_LOCATION_CITY);
+//        buf.writeBytes(String.valueOf(location.city).getBytes(CharsetUtil.UTF_8));
+//        buf.writeBytes(BYTES_LOCATION_DISTANCE);
+//        buf.writeBytes(String.valueOf(location.distance).getBytes(CharsetUtil.UTF_8));
+//        buf.writeBytes(BYTES_LOCATION_END);
+
+        buf.writeBytes(
+                ("{\"id\":" + location.id + ",\"place\":\"" + location.place + "\",\"country\":\"" + location.country + "\",\"city\":\"" + location.city +
+                        "\",\"distance\":" + location.distance + "}"
+                ).getBytes(CharsetUtil.UTF_8)
+        );
     }
 
     private void writeUser(User user, ByteBuf buf) {
-        buf.writeBytes(BYTES_USER_ID);
-        buf.writeBytes(String.valueOf(user.id).getBytes(CharsetUtil.UTF_8));
-        buf.writeBytes(BYTES_USER_EMAIL);
-        buf.writeBytes(String.valueOf(user.email).getBytes(CharsetUtil.UTF_8));
-        buf.writeBytes(BYTES_USER_FIRST_NAME);
-        buf.writeBytes(String.valueOf(user.firstName).getBytes(CharsetUtil.UTF_8));
-        buf.writeBytes(BYTES_USER_LAST_NAME);
-        buf.writeBytes(String.valueOf(user.lastName).getBytes(CharsetUtil.UTF_8));
-        buf.writeBytes(BYTES_USER_GENDER);
-        buf.writeBytes(String.valueOf(user.gender).getBytes(CharsetUtil.UTF_8));
-        buf.writeBytes(BYTES_USER_BIRTH_DATE);
-        buf.writeBytes(String.valueOf(user.birthDate).getBytes(CharsetUtil.UTF_8));
-        buf.writeBytes(BYTES_USER_END);
+//        buf.writeBytes(BYTES_USER_ID);
+//        buf.writeBytes(String.valueOf(user.id).getBytes(CharsetUtil.UTF_8));
+//        buf.writeBytes(BYTES_USER_EMAIL);
+//        buf.writeBytes(String.valueOf(user.email).getBytes(CharsetUtil.UTF_8));
+//        buf.writeBytes(BYTES_USER_FIRST_NAME);
+//        buf.writeBytes(String.valueOf(user.firstName).getBytes(CharsetUtil.UTF_8));
+//        buf.writeBytes(BYTES_USER_LAST_NAME);
+//        buf.writeBytes(String.valueOf(user.lastName).getBytes(CharsetUtil.UTF_8));
+//        buf.writeBytes(BYTES_USER_GENDER);
+//        buf.writeBytes(String.valueOf(user.gender).getBytes(CharsetUtil.UTF_8));
+//        buf.writeBytes(BYTES_USER_BIRTH_DATE);
+//        buf.writeBytes(String.valueOf(user.birthDate).getBytes(CharsetUtil.UTF_8));
+//        buf.writeBytes(BYTES_USER_END);
+
+        buf.writeBytes(
+                ("{\"id\":" + user.id + ",\"email\":\"" + user.email + "\",\"first_name\":\"" + user.firstName + "\",\"last_name\":\"" + user.lastName +
+                        "\",\"gender\":\"" + user.gender + "\",\"birth_date\":" + user.birthDate + "}"
+                ).getBytes(CharsetUtil.UTF_8)
+        );
     }
 
     public static final byte[] BYTES_USER_VISIT_MARK = "{\"mark\":".getBytes(CharsetUtil.UTF_8);
