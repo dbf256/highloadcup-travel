@@ -21,7 +21,7 @@ public class ServerInitializer extends ChannelInitializer<SocketChannel> {
         //engine.setUseClientMode(false);
         //p.addLast("ssl", new SslHandler(engine));
 
-        p.addLast("decoder", new HttpRequestDecoder());
+        p.addLast("decoder", new HttpRequestDecoder(4096, 8192, 8192, false));
         // Uncomment the following line if you don't want to handle HttpChunks.
         //p.addLast("aggregator", new HttpObjectAggregator(1048576));
         p.addLast("encoder", new HttpResponseEncoder());
