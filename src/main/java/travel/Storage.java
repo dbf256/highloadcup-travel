@@ -236,9 +236,6 @@ class Storage {
     }
 
     public Double locationAverage(long locationId, Long fromDate, Long toDate, Long fromAge, Long toAge, Character gender) {
-        if (locations.get(locationId) == null) {
-            throw new StorageNotFoundException();
-        }
 
         long fromTimestamp = 0;
         if (fromAge != null) {
@@ -289,7 +286,7 @@ class Storage {
         }
     }
 
-    public List<Visit> userVisits(long userId,  Long fromDate, Long toDate, Long toDistance, String country) {
+    public List<Visit> userVisits(long userId, Long fromDate, Long toDate, Long toDistance, String country) {
         List<Visit> userVisits = new ArrayList<>();
         for (Visit visit : visitsByUser.getOrDefault(userId, Collections.emptySet())) {
             //Visit visit = visits.get(visitId);

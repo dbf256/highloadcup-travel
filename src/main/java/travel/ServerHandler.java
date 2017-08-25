@@ -22,11 +22,6 @@ import static travel.model.Constants.BUF_SIZE;
 
 public class ServerHandler extends SimpleChannelInboundHandler<Object> {
 
-    @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) {
-        ctx.flush();
-    }
-    
     private static final List<String> ENTITIES = Arrays.asList("locations", "users", "visits");
 
     
@@ -388,13 +383,13 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
     private void writeCode(HttpResponseStatus status, ChannelHandlerContext ctx) {
         FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, status, EMPTY_BUFF, false);
         addHeaders(response);
-        ctx.write(response);
+        ctx.writeAndFlush(response);
     }
 
     private void writeResult(HttpResponseStatus status, ByteBuf buffer, ChannelHandlerContext ctx) {
         FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, status, buffer, false);
         addHeaders(response);
-        ctx.write(response);
+        ctx.writeAndFlush(response);
     }
 
     @Override
