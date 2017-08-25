@@ -30,16 +30,19 @@ public class Reader {
                     for (JsonElement element : o.get("locations").getAsJsonArray()) {
                         Location location = new Location(element.getAsJsonObject());
                         storage.insert(location);
+                        storage.updateLocationJson(location.id, element.toString());
                     }
                 } else if (o.keySet().contains("users")) {
                     for (JsonElement element : o.get("users").getAsJsonArray()) {
                         User user = new User(element.getAsJsonObject());
                         storage.insert(user);
+                        storage.updateUserJson(user.id, element.toString());
                     }
                 } else if (o.keySet().contains("visits")) {
                     for (JsonElement element : o.get("visits").getAsJsonArray()) {
                         Visit visit = new Visit(element.getAsJsonObject());
                         storage.insert(visit);
+                        storage.updateVisitJson(visit.id, element.toString());
                     }
                 }
                 o = null;

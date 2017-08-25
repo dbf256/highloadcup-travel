@@ -1,5 +1,8 @@
 package travel;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.util.CharsetUtil;
 import travel.model.Location;
 import travel.model.User;
 import travel.model.UserVisit;
@@ -10,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static travel.model.Constants.BUF_SIZE;
 import static travel.model.Constants.INT_FIELD_MISSING;
 import static travel.model.Constants.LONG_FIELD_MISSING;
 
@@ -20,10 +24,15 @@ class Storage {
     public final Map<Long, Set<Visit>> visitsByUser = new ConcurrentHashMap<>();
     public final Map<Long, Set<Visit>> visitsByLocation = new ConcurrentHashMap<>();
 
+    public final Map<Long, ByteBuf> userJson = new ConcurrentHashMap<>();
+    public final Map<Long, ByteBuf> locationJson = new ConcurrentHashMap<>();
+    public final Map<Long, ByteBuf> visitJson = new ConcurrentHashMap<>();
+
     public final AtomicInteger requestsCount = new AtomicInteger();
     public final AtomicBoolean firstStageGc = new AtomicBoolean(false);
     public final AtomicBoolean secondStageGc = new AtomicBoolean(false);
     public final AtomicBoolean gcTracker = new AtomicBoolean(false);
+
 
 
     public void clear() {
@@ -32,6 +41,36 @@ class Storage {
         visits.clear();
         visitsByUser.clear();
         visitsByLocation.clear();
+    }
+
+    public void updateUserJson(Long id, String json) {
+        ByteBuf buf = Unpooled.buffer(BUF_SIZE);
+        buf.writeBytes(json.getBytes(CharsetUtil.UTF_8));
+        userJson.put(id, buf);
+    }
+
+    public void updateLocationJson(Long id, String json) {
+        ByteBuf buf = Unpooled.buffer(BUF_SIZE);
+        buf.writeBytes(json.getBytes(CharsetUtil.UTF_8));
+        locationJson.put(id, buf);
+    }
+
+    public void updateVisitJson(Long id, String json) {
+        ByteBuf buf = Unpooled.buffer(BUF_SIZE);
+        buf.writeBytes(json.getBytes(CharsetUtil.UTF_8));
+        visitJson.put(id, buf);
+    }
+
+    public ByteBuf getUserJson(Long id) {
+        return userJson.get(id);
+    }
+
+    public ByteBuf getVisitJson(Long id) {
+        return visitJson.get(id);
+    }
+
+    public ByteBuf getLocationJson(Long id) {
+        return locationJson.get(id);
     }
 
     public void resetRequestsCounter() {
@@ -67,6 +106,9 @@ class Storage {
         if (update.email != null) {
             currentUser.email = update.email;
         }
+        ByteBuf buf = Unpooled.buffer(BUF_SIZE);
+        buf.writeBytes(currentUser.toJson().toString().getBytes(CharsetUtil.UTF_8));
+        userJson.put(id, buf);
     }
 
     public void insert(Location location) {
@@ -90,6 +132,9 @@ class Storage {
         if (update.place != null) {
             currentLocation.place = update.place;
         }
+        ByteBuf buf = Unpooled.buffer(BUF_SIZE);
+        buf.writeBytes(currentLocation.toJson().toString().getBytes(CharsetUtil.UTF_8));
+        locationJson.put(id, buf);
     }
 
     public void insert(Visit visit) {
@@ -161,6 +206,9 @@ class Storage {
         if (update.visited != LONG_FIELD_MISSING) {
             currentVisit.visited = update.visited;
         }
+        ByteBuf buf = Unpooled.buffer(BUF_SIZE);
+        buf.writeBytes(currentVisit.toJson().toString().getBytes(CharsetUtil.UTF_8));
+        visitJson.put(id, buf);
     }
 
     public User getUser(long id) {

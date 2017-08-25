@@ -41,6 +41,12 @@
             <artifactId>netty-all</artifactId>
             <version>4.1.14.Final</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>fluent-hc</artifactId>
+            <version>4.5.3</version>
+        </dependency>
         
     </dependencies>
 
