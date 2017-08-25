@@ -394,7 +394,6 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
     private void writeResult(HttpResponseStatus status, ByteBuf buffer, ChannelHandlerContext ctx) {
         FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, status, buffer, false);
         addHeaders(response);
-        response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
         ctx.write(response);
     }
 
