@@ -33,6 +33,10 @@ public class Main {
         }
     }
 
+    private void prepare() {
+        System.gc();
+    }
+
     public void run() throws Exception {
         // Configure the server.
         String os = getOperatingSystemType();
@@ -47,6 +51,7 @@ public class Main {
             System.out.println("Started");
             Channel ch = b.bind(port).sync().channel();
             new Warmup().warmup();
+            prepare();
             ch.closeFuture().sync();
         } finally {
             bossGroup.shutdownGracefully();

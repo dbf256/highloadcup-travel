@@ -35,7 +35,5 @@ public class Warmup {
         }
         System.out.println("Warmup: " + objects.size() + " in " + (System.currentTimeMillis() - start));
         objects = null;
-        System.gc();
-
     }
 }

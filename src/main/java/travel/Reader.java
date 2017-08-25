@@ -49,6 +49,5 @@ public class Reader {
             }
         }
         System.out.println("Done");
-        System.gc();
     }
 }
