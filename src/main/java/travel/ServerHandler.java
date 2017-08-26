@@ -83,9 +83,9 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
     //}
 
     private void handleGet(String entity, String id, ChannelHandlerContext ctx) {
-        long entityId = 0;
+        int entityId = 0;
         try {
-            entityId = Long.parseLong(id);
+            entityId = Integer.parseInt(id);
         } catch (NumberFormatException e) {
             writeCode(HttpResponseStatus.NOT_FOUND, ctx, false);
             return;
@@ -128,9 +128,9 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
 
     private void handleUpdate(String entity, String id, FullHttpRequest request, ChannelHandlerContext ctx) {
         String body = request.content().toString(CharsetUtil.UTF_8);
-        long entityId;
+        int entityId;
         try {
-            entityId = Long.parseLong(id);
+            entityId = Integer.parseInt(id);
         } catch (NumberFormatException e) {
             writeCode(HttpResponseStatus.BAD_REQUEST, ctx, true);
             return;
@@ -203,35 +203,35 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
     private void handleAvg(String id, FullHttpRequest request, ChannelHandlerContext ctx) {
         Location location = null;
         try {
-            long locationId = Long.parseLong(id);
+            int locationId = Integer.parseInt(id);
             location = Main.storage.getLocation(locationId);
         } catch (NumberFormatException | StorageNotFoundException e) {
             writeCode(HttpResponseStatus.NOT_FOUND, ctx, false);
             return;
         }
-        Long fromDate = null;
-        Long toDate = null;
-        Long fromAge = null;
-        Long toAge = null;
+        Integer fromDate = null;
+        Integer toDate = null;
+        Integer fromAge = null;
+        Integer toAge = null;
         String gender = null;
         QueryStringDecoder queryStringDecoder = new QueryStringDecoder(request.uri());
         Map<String, List<String>> params = queryStringDecoder.parameters();
         try {
             List<String> param = params.get("fromDate");
             if (param != null) {
-                fromDate = Long.valueOf(param.get(0));
+                fromDate = Integer.valueOf(param.get(0));
             }
             param = params.get("toDate");
             if (param != null) {
-                toDate = Long.valueOf(param.get(0));
+                toDate = Integer.valueOf(param.get(0));
             }
             param = params.get("fromAge");
             if (param != null) {
-                fromAge = Long.valueOf(param.get(0));
+                fromAge = Integer.valueOf(param.get(0));
             }
             param = params.get("toAge");
             if (param != null) {
-                toAge = Long.valueOf(param.get(0));
+                toAge = Integer.valueOf(param.get(0));
             }
             param = params.get("gender");
             if (param != null) {
@@ -261,30 +261,30 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
     private void handleVisits(String id, FullHttpRequest request, ChannelHandlerContext ctx) {
         User user = null;
         try {
-            long userId = Long.parseLong(id);
+            int userId = Integer.parseInt(id);
             user = Main.storage.getUser(userId);
         } catch (NumberFormatException | StorageNotFoundException e) {
             writeCode(HttpResponseStatus.NOT_FOUND, ctx, false);
             return;
         }
-        Long fromDate = null;
-        Long toDate = null;
-        Long toDistance = null;
+        Integer fromDate = null;
+        Integer toDate = null;
+        Integer toDistance = null;
         String country = null;
         QueryStringDecoder queryStringDecoder = new QueryStringDecoder(request.uri());
         Map<String, List<String>> params = queryStringDecoder.parameters();
         try {
             List<String> param = params.get("fromDate");
             if (param != null) {
-                fromDate = Long.valueOf(param.get(0));
+                fromDate = Integer.valueOf(param.get(0));
             }
             param = params.get("toDate");
             if (param != null) {
-                toDate = Long.valueOf(param.get(0));
+                toDate = Integer.valueOf(param.get(0));
             }
             param = params.get("toDistance");
             if (param != null) {
-                toDistance = Long.valueOf(param.get(0));
+                toDistance = Integer.valueOf(param.get(0));
             }
             param = params.get("country");
             if (param != null) {

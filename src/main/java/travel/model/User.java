@@ -8,14 +8,14 @@ import static travel.model.JsonUtil.*;
 
 // {"first_name": "Пётр", "last_name": "Фетатосян", "birth_date": -1720915200, "gender": "m", "id": 1, "email": "wibylcudestiwuk@icloud.com"}
 public class User {
-    public long id;
+    public int id;
     public String firstName;
     public String lastName;
-    public long birthDate;
+    public int birthDate;
     public Character gender;
     public String email;
 
-    public User(long id, String firstName, String lastName, long birthDate, Character gender, String email) {
+    public User(int id, String firstName, String lastName, int birthDate, Character gender, String email) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -25,10 +25,10 @@ public class User {
     }
 
     public User(JsonObject object) {
-        this.id = getAsLongPrimitive(object, "id");
+        this.id = getAsIntegerPrimitive(object, "id");
         this.firstName = getAsString(object, "first_name");
         this.lastName = JsonUtil.getAsString(object, "last_name");
-        this.birthDate = JsonUtil.getAsLongPrimitive(object, "birth_date");
+        this.birthDate = JsonUtil.getAsIntegerPrimitive(object, "birth_date");
         this.gender = JsonUtil.getAsCharacter(object, "gender");
         this.email = JsonUtil.getAsString(object, "email");
     }

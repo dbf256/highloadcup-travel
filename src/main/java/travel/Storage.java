@@ -18,11 +18,11 @@ import static travel.model.Constants.INT_FIELD_MISSING;
 import static travel.model.Constants.LONG_FIELD_MISSING;
 
 class Storage {
-    public final Map<Long, User> users = new ConcurrentHashMap<>();
-    public final Map<Long, Location> locations = new ConcurrentHashMap<>();
-    public final Map<Long, Visit> visits = new ConcurrentHashMap<>();
-    public final Map<Long, List<Visit>> visitsByUser = new ConcurrentHashMap<>();
-    public final Map<Long, List<Visit>> visitsByLocation = new ConcurrentHashMap<>();
+    public final Map<Integer, User> users = new ConcurrentHashMap<>();
+    public final Map<Integer, Location> locations = new ConcurrentHashMap<>();
+    public final Map<Integer, Visit> visits = new ConcurrentHashMap<>();
+    public final Map<Integer, List<Visit>> visitsByUser = new ConcurrentHashMap<>();
+    public final Map<Integer, List<Visit>> visitsByLocation = new ConcurrentHashMap<>();
 
     public final Map<Long, ByteBuf> userJson = new ConcurrentHashMap<>();
     public final Map<Long, ByteBuf> locationJson = new ConcurrentHashMap<>();
@@ -73,12 +73,12 @@ class Storage {
         users.put(user.id, user);
     }
 
-    public void update(long id, User update) {
+    public void update(int id, User update) {
         User currentUser = users.get(id);
         if (currentUser == null) {
             throw new StorageNotFoundException();
         }
-        if (update.birthDate != LONG_FIELD_MISSING) {
+        if (update.birthDate != INT_FIELD_MISSING) {
             currentUser.birthDate = update.birthDate;
         }
         if (update.firstName != null) {
@@ -102,7 +102,7 @@ class Storage {
         locations.put(location.id, location);
     }
 
-    public void update(long id, Location update) {
+    public void update(int id, Location update) {
         Location currentLocation = locations.get(id);
         if (currentLocation == null) {
             throw new StorageNotFoundException();
@@ -113,7 +113,7 @@ class Storage {
         if (update.country != null) {
             currentLocation.country = update.country;
         }
-        if (update.distance != LONG_FIELD_MISSING) {
+        if (update.distance != INT_FIELD_MISSING) {
             currentLocation.distance = update.distance;
         }
         if (update.place != null) {
@@ -132,7 +132,7 @@ class Storage {
 
     }
 
-    private void addLocationVisit(long visitId, long locationId) {
+    private void addLocationVisit(int visitId, int locationId) {
         Visit visit = visits.get(visitId);
         List<Visit> byLocation = visitsByLocation.get(locationId);
         if (byLocation == null) {
@@ -142,7 +142,7 @@ class Storage {
         byLocation.add(visit);
     }
 
-    private void addUserVisit(long visitId, long userId) {
+    private void addUserVisit(int visitId, int userId) {
         Visit visit = visits.get(visitId);
         List<Visit> byUser = visitsByUser.get(userId);
         if (byUser == null) {
@@ -152,7 +152,7 @@ class Storage {
         byUser.add(visit);
     }
 
-    private void deleteLocationVisit(long visitId, long locationId) {
+    private void deleteLocationVisit(int visitId, int locationId) {
         Visit visit = visits.get(visitId);
         List<Visit> byLocation = visitsByLocation.get(locationId);
         if (byLocation != null) {
@@ -160,7 +160,7 @@ class Storage {
         }
     }
 
-    private void deleteUserVisit(long visitId, long userId) {
+    private void deleteUserVisit(int visitId, int userId) {
         Visit visit = visits.get(visitId);
         List<Visit> byUser = visitsByUser.get(userId);
         if (byUser != null) {
@@ -168,12 +168,12 @@ class Storage {
         }
     }
 
-    public void update(long id, Visit update) {
+    public void update(int id, Visit update) {
         Visit currentVisit = visits.get(id);
         if (currentVisit == null) {
             throw new StorageNotFoundException();
         }
-        if (update.location != LONG_FIELD_MISSING) {
+        if (update.location != INT_FIELD_MISSING) {
             if (currentVisit.location != update.location) {
                 deleteLocationVisit(currentVisit.id, currentVisit.location);
                 addLocationVisit(currentVisit.id, update.location);
@@ -183,14 +183,14 @@ class Storage {
         if (update.mark != INT_FIELD_MISSING) {
             currentVisit.mark = update.mark;
         }
-        if (update.user != LONG_FIELD_MISSING) {
+        if (update.user != INT_FIELD_MISSING) {
             if (currentVisit.user != update.user) {
                 deleteUserVisit(currentVisit.id, currentVisit.user);
                 addUserVisit(currentVisit.id, update.user);
             }
             currentVisit.user = update.user;
         }
-        if (update.visited != LONG_FIELD_MISSING) {
+        if (update.visited != INT_FIELD_MISSING) {
             currentVisit.visited = update.visited;
         }
         //ByteBuf buf = Unpooled.buffer(BUF_SIZE);
@@ -198,7 +198,7 @@ class Storage {
         //visitJson.put(id, buf);
     }
 
-    public User getUser(long id) {
+    public User getUser(int id) {
         User currentUser = users.get(id);
         if (currentUser == null) {
             throw new StorageNotFoundException();
@@ -206,7 +206,7 @@ class Storage {
         return currentUser;
     }
 
-    public Location getLocation(long id) {
+    public Location getLocation(int id) {
         Location currentLocation = locations.get(id);
         if (currentLocation == null) {
             throw new StorageNotFoundException();
@@ -214,7 +214,7 @@ class Storage {
         return currentLocation;
     }
 
-    public Visit getVisit(long id) {
+    public Visit getVisit(int id) {
         Visit currentVisit = visits.get(id);
         if (currentVisit == null) {
             throw new StorageNotFoundException();
@@ -222,12 +222,12 @@ class Storage {
         return currentVisit;
     }
 
-    public Double locationAverage(long locationId, Long fromDate, Long toDate, Long fromAge, Long toAge, Character gender) {
+    public Double locationAverage(int locationId, Integer fromDate, Integer toDate, Integer fromAge, Integer toAge, Character gender) {
 
         long fromTimestamp = 0;
         if (fromAge != null) {
             Calendar fromCalendar = Calendar.getInstance();
-            fromCalendar.add(Calendar.YEAR, -fromAge.intValue());
+            fromCalendar.add(Calendar.YEAR, -fromAge);
             fromTimestamp = fromCalendar.getTimeInMillis() / 1000;
         }
 
@@ -235,7 +235,7 @@ class Storage {
 
         if (toAge != null) {
             Calendar toCalendar = Calendar.getInstance();
-            toCalendar.add(Calendar.YEAR, -toAge.intValue());
+            toCalendar.add(Calendar.YEAR, -toAge);
             toTimestamp = toCalendar.getTimeInMillis() / 1000;
         }
 
@@ -273,7 +273,7 @@ class Storage {
         }
     }
 
-    public List<Visit> userVisits(long userId, Long fromDate, Long toDate, Long toDistance, String country) {
+    public List<Visit> userVisits(int userId, Integer fromDate, Integer toDate, Integer toDistance, String country) {
         List<Visit> userVisits = new ArrayList<>();
         for (Visit visit : visitsByUser.getOrDefault(userId, Collections.emptyList())) {
             //Visit visit = visits.get(visitId);

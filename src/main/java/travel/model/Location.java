@@ -4,18 +4,18 @@ import com.google.gson.JsonObject;
 
 import java.util.Objects;
 
+import static travel.model.JsonUtil.getAsIntegerPrimitive;
 import static travel.model.JsonUtil.getAsLong;
-import static travel.model.JsonUtil.getAsLongPrimitive;
 
 // {"distance": 6, "city": "Москва", "place": "Набережная", "id": 1, "country": "Аргентина"}
 public class Location {
-    public long id;
-    public long distance;
+    public int id;
+    public int distance;
     public String city;
     public String place;
     public String country;
 
-    public Location(long id, long distance, String city, String place, String country) {
+    public Location(int id, int distance, String city, String place, String country) {
         this.id = id;
         this.distance = distance;
         this.city = city;
@@ -24,8 +24,8 @@ public class Location {
     }
 
     public Location(JsonObject object) {
-        this.id = getAsLongPrimitive(object, "id");
-        this.distance = getAsLongPrimitive(object, "distance");
+        this.id = getAsIntegerPrimitive(object, "id");
+        this.distance = getAsIntegerPrimitive(object, "distance");
         this.city = JsonUtil.getAsString(object, "city");
         this.place = JsonUtil.getAsString(object, "place");
         this.country = JsonUtil.getAsString(object, "country");

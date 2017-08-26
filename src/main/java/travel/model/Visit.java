@@ -6,13 +6,13 @@ import java.util.Objects;
 
 // {"user": 44, "location": 32, "visited_at": 1103485742, "id": 1, "mark": 4}
 public class Visit {
-    public long id;
-    public long user;
-    public long location;
-    public long visited;
+    public int id;
+    public int user;
+    public int location;
+    public int visited;
     public int mark;
 
-    public Visit(long id, long user, long location, long visited, int mark) {
+    public Visit(int id, int user, int location, int visited, int mark) {
         this.id = id;
         this.user = user;
         this.location = location;
@@ -21,10 +21,10 @@ public class Visit {
     }
 
     public Visit(JsonObject object) {
-        this.id = JsonUtil.getAsLongPrimitive(object, "id");
-        this.user = JsonUtil.getAsLongPrimitive(object, "user");
-        this.location = JsonUtil.getAsLongPrimitive(object, "location");
-        this.visited = JsonUtil.getAsLongPrimitive(object, "visited_at");
+        this.id = JsonUtil.getAsIntegerPrimitive(object, "id");
+        this.user = JsonUtil.getAsIntegerPrimitive(object, "user");
+        this.location = JsonUtil.getAsIntegerPrimitive(object, "location");
+        this.visited = JsonUtil.getAsIntegerPrimitive(object, "visited_at");
         this.mark = JsonUtil.getAsIntegerPrimitive(object, "mark");
     }
 

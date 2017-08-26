@@ -44,28 +44,23 @@ public class JsonUtil {
         }
     }
 
-    public static long getAsLongPrimitive(JsonObject object, String field) {
-        JsonElement element = object.get(field);
-        if (element != null && !element.isJsonNull()) {
-            String strElem = element.getAsString();
-            if (StringUtils.isNumeric(strElem) || (strElem.charAt(0) == '-' && StringUtils.isNumeric(strElem.substring(1)))) {
-                return element.getAsLong();
-            } else {
-                throw new IllegalArgumentException();
+    private static boolean isNumeric(String s) {
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if ((i == 0 && c == '-') || (c >= '0' && c <= '9')) {
+                continue;
             }
-        } else if (element != null && element.isJsonNull()) {
-            throw new IllegalArgumentException();
-        } else {
-            return Constants.LONG_FIELD_MISSING;
+            return false;
         }
+        return true;
     }
 
     public static int getAsIntegerPrimitive(JsonObject object, String field) {
         JsonElement element = object.get(field);
         if (element != null && !element.isJsonNull()) {
             String strElem = element.getAsString();
-            if (StringUtils.isNumeric(strElem) || (strElem.charAt(0) == '-' && StringUtils.isNumeric(strElem.substring(1)))) {
-                return (int)element.getAsLong();
+            if (isNumeric(strElem)) {
+                return element.getAsInt();
             } else {
                 throw new IllegalArgumentException();
             }

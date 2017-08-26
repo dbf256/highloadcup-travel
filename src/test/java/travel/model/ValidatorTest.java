@@ -15,7 +15,7 @@ public class ValidatorTest {
     public void testVisitInsert() {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.YEAR, - 10);
-        Visit visit = new Visit(1L, 2L, 3L, cal.getTimeInMillis() / 1000, 2);
+        Visit visit = new Visit(1, 2, 3, (int)(cal.getTimeInMillis() / 1000), 2);
         Assert.assertTrue(validator.validate(visit, false));
     }
     

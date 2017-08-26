@@ -15,7 +15,7 @@ public class TestDataGenerator {
         return RandomStringUtils.randomAlphanumeric(size).toUpperCase();
     }
 
-    public static long getBirthDay() {
+    public static int getBirthDay() {
         Calendar calendar = Calendar.getInstance();
         Random random = new Random();
         int years = random.nextInt(70);
@@ -24,10 +24,10 @@ public class TestDataGenerator {
         calendar.add(Calendar.YEAR, -years);
         calendar.add(Calendar.MONTH, -month);
         calendar.add(Calendar.DAY_OF_MONTH, -day);
-        return calendar.getTimeInMillis() / 1000;
+        return (int)(calendar.getTimeInMillis() / 1000);
     }
 
-    public static long getVisited() {
+    public static int getVisited() {
         Calendar calendar = Calendar.getInstance();
         Random random = new Random();
         int years = random.nextInt(15);
@@ -36,7 +36,7 @@ public class TestDataGenerator {
         calendar.add(Calendar.YEAR, -years);
         calendar.add(Calendar.MONTH, -month);
         calendar.add(Calendar.DAY_OF_MONTH, -day);
-        return calendar.getTimeInMillis() / 1000;
+        return (int)(calendar.getTimeInMillis() / 1000);
     }
 
     public static char getGender() {
@@ -58,7 +58,7 @@ public class TestDataGenerator {
 
         PrintWriter writer = new PrintWriter("C:\\Projects\\travel\\data\\data\\big\\users_1.json", "UTF-8");
         writer.write("{\"users\": [");
-        for (long i = 0; i < USERS; i++) {
+        for (int i = 0; i < USERS; i++) {
             User user = new User(i, randomString(20), randomString(20), getBirthDay(), getGender(), randomString(20));
             writer.write(user.toJson().toString());
             if (i != USERS - 1) {
@@ -71,8 +71,8 @@ public class TestDataGenerator {
 
         writer = new PrintWriter("C:\\Projects\\travel\\data\\data\\big\\locations_1.json", "UTF-8");
         writer.write("{\"locations\": [");
-        for (long i = 0; i < LOCATIONS; i++) {
-            Location location = new Location(i, (long)random.nextInt(500), randomString(50), randomString(50), randomString(50));
+        for (int i = 0; i < LOCATIONS; i++) {
+            Location location = new Location(i, random.nextInt(500), randomString(50), randomString(50), randomString(50));
             writer.write(location.toJson().toString());
             if (i != LOCATIONS - 1) {
                 writer.write(",");
@@ -83,8 +83,8 @@ public class TestDataGenerator {
 
         writer = new PrintWriter("C:\\Projects\\travel\\data\\data\\big\\visits_1.json", "UTF-8");
         writer.write("{\"visits\": [");
-        for (long i = 0; i < VISITS; i++) {
-            Visit visit = new Visit(i, (long)random.nextInt(USERS), (long)random.nextInt(LOCATIONS), getVisited(), random.nextInt(6));
+        for (int i = 0; i < VISITS; i++) {
+            Visit visit = new Visit(i, random.nextInt(USERS), random.nextInt(LOCATIONS), getVisited(), random.nextInt(6));
             writer.write(visit.toJson().toString());
             if (i != VISITS - 1) {
                 writer.write(",");
