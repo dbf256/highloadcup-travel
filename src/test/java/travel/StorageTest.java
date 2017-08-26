@@ -165,12 +165,12 @@ public class StorageTest {
         storage.insert(location1);storage.insert(location2);storage.insert(location3);storage.insert(location4);
         storage.insert(visit1);storage.insert(visit2);
 
-        assertEquals(new HashSet<>(Arrays.asList(visit1, visit2)), storage.visitsByUser.get(user1.id));
-        assertEquals(new HashSet<>(Arrays.asList(visit1)), storage.visitsByLocation.get(location1.id));
-        assertEquals(new HashSet<>(Arrays.asList(visit2)), storage.visitsByLocation.get(location2.id));
-        assertEquals(new HashSet<>(Arrays.asList()), storage.visitsByUser.getOrDefault(user2.id, Collections.emptySet()));
-        assertEquals(new HashSet<>(Arrays.asList()), storage.visitsByLocation.getOrDefault(location3.id, Collections.emptySet()));
-        assertEquals(new HashSet<>(Arrays.asList()), storage.visitsByLocation.getOrDefault(location4.id, Collections.emptySet()));
+        assertEquals(Arrays.asList(visit1, visit2), storage.visitsByUser.get(user1.id));
+        assertEquals(Arrays.asList(visit1), storage.visitsByLocation.get(location1.id));
+        assertEquals(Arrays.asList(visit2), storage.visitsByLocation.get(location2.id));
+        assertEquals(Arrays.asList(), storage.visitsByUser.getOrDefault(user2.id, Collections.emptyList()));
+        assertEquals(Arrays.asList(), storage.visitsByLocation.getOrDefault(location3.id, Collections.emptyList()));
+        assertEquals(Arrays.asList(), storage.visitsByLocation.getOrDefault(location4.id, Collections.emptyList()));
 
         /* change user and location */
         Visit visit1Updated = new Visit(1L, 2L, 3L, 10L, 1);
@@ -179,12 +179,12 @@ public class StorageTest {
         storage.update(visit1.id, visit1Updated);
         storage.update(visit2.id, visit2Updated);
 
-        assertTrue(EqualsBuilder.reflectionEquals(new HashSet<>(Arrays.asList()), storage.visitsByUser.getOrDefault(user1.id, Collections.emptySet())));
-        assertTrue(EqualsBuilder.reflectionEquals(new HashSet<>(Arrays.asList()), storage.visitsByLocation.getOrDefault(location1.id, Collections.emptySet())));
-        assertTrue(EqualsBuilder.reflectionEquals(new HashSet<>(Arrays.asList()), storage.visitsByLocation.getOrDefault(location1.id, Collections.emptySet())));
-        assertTrue(EqualsBuilder.reflectionEquals(new HashSet<>(Arrays.asList(visit1, visit2)), storage.visitsByUser.get(user2.id)));
-        assertTrue(EqualsBuilder.reflectionEquals(new HashSet<>(Arrays.asList(visit1)), storage.visitsByLocation.get(location3.id)));
-        assertTrue(EqualsBuilder.reflectionEquals(new HashSet<>(Arrays.asList(visit2)), storage.visitsByLocation.get(location4.id)));
+        assertEquals(Arrays.asList(), storage.visitsByUser.getOrDefault(user1.id, Collections.emptyList()));
+        assertEquals(Arrays.asList(), storage.visitsByLocation.getOrDefault(location1.id, Collections.emptyList()));
+        assertEquals(Arrays.asList(), storage.visitsByLocation.getOrDefault(location1.id, Collections.emptyList()));
+        assertEquals(Arrays.asList(visit1, visit2), storage.visitsByUser.get(user2.id));
+        assertEquals(Arrays.asList(visit1), storage.visitsByLocation.get(location3.id));
+        assertEquals(Arrays.asList(visit2), storage.visitsByLocation.get(location4.id));
 
         /* change user and location back */
         Visit visit1Updated2 = new Visit(1L, 1L, 1L, 10L, 1);
@@ -193,12 +193,12 @@ public class StorageTest {
         storage.update(visit1.id, visit1Updated2);
         storage.update(visit2.id, visit2Updated2);
 
-        assertTrue(EqualsBuilder.reflectionEquals(new HashSet<>(Arrays.asList(visit1, visit2)), storage.visitsByUser.get(user1.id)));
-        assertTrue(EqualsBuilder.reflectionEquals(new HashSet<>(Arrays.asList(visit1)), storage.visitsByLocation.get(location1.id)));
-        assertTrue(EqualsBuilder.reflectionEquals(new HashSet<>(Arrays.asList(visit2)), storage.visitsByLocation.get(location2.id)));
-        assertTrue(EqualsBuilder.reflectionEquals(new HashSet<>(Arrays.asList()), storage.visitsByUser.getOrDefault(user2.id, Collections.emptySet())));
-        assertTrue(EqualsBuilder.reflectionEquals(new HashSet<>(Arrays.asList()), storage.visitsByLocation.getOrDefault(location3.id, Collections.emptySet())));
-        assertTrue(EqualsBuilder.reflectionEquals(new HashSet<>(Arrays.asList()), storage.visitsByLocation.getOrDefault(location4.id, Collections.emptySet())));
+        assertEquals(Arrays.asList(visit1, visit2), storage.visitsByUser.get(user1.id));
+        assertEquals(Arrays.asList(visit1), storage.visitsByLocation.get(location1.id));
+        assertEquals(Arrays.asList(visit2), storage.visitsByLocation.get(location2.id));
+        assertEquals(Arrays.asList(), storage.visitsByUser.getOrDefault(user2.id, Collections.emptyList()));
+        assertEquals(Arrays.asList(), storage.visitsByLocation.getOrDefault(location3.id, Collections.emptyList()));
+        assertEquals(Arrays.asList(), storage.visitsByLocation.getOrDefault(location4.id, Collections.emptyList()));
 
     }
 
