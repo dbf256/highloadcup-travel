@@ -12,6 +12,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static travel.model.Constants.BUF_SIZE;
 import static travel.model.Constants.INT_FIELD_MISSING;
@@ -28,7 +29,8 @@ class Storage {
     public final Map<Long, ByteBuf> locationJson = new ConcurrentHashMap<>();
     public final Map<Long, ByteBuf> visitJson = new ConcurrentHashMap<>();
 
-    public final AtomicInteger requestsCount = new AtomicInteger();
+
+    public final AtomicLong currentTime = new AtomicLong(System.currentTimeMillis());
 
     public void clear() {
         users.clear();
@@ -227,6 +229,7 @@ class Storage {
         long fromTimestamp = 0;
         if (fromAge != null) {
             Calendar fromCalendar = Calendar.getInstance();
+            fromCalendar.setTimeInMillis(currentTime.get());
             fromCalendar.add(Calendar.YEAR, -fromAge);
             fromTimestamp = fromCalendar.getTimeInMillis() / 1000;
         }
@@ -235,6 +238,7 @@ class Storage {
 
         if (toAge != null) {
             Calendar toCalendar = Calendar.getInstance();
+            toCalendar.setTimeInMillis(currentTime.get());
             toCalendar.add(Calendar.YEAR, -toAge);
             toTimestamp = toCalendar.getTimeInMillis() / 1000;
         }

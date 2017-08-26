@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class Reader {
@@ -48,6 +49,13 @@ public class Reader {
                 o = null;
             }
         }
+
+
+        List<String> lines = Files.readAllLines(Paths.get(System.getenv("DATA_PATH"), "options.txt"), StandardCharsets.UTF_8);
+        long currentTime = Long.valueOf(lines.get(0));
+        boolean testMode = Integer.valueOf(lines.get(1)) == 0;
+        storage.currentTime.set(currentTime * 1000);
+        System.out.println("Current time: " + currentTime);
         System.out.println("Done");
     }
 }
