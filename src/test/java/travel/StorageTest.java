@@ -126,9 +126,6 @@ public class StorageTest {
         storage.insert(location1);storage.insert(location2);
         storage.insert(visit1);storage.insert(visit2);
 
-        UserVisit userVisit1 = new UserVisit(1, 10, "w1");
-        UserVisit userVisit2 = new UserVisit(2, 20, "w2");
-
         assertEquals(Arrays.asList(visit1, visit2), storage.userVisits(1, null, null, null, null));
 
         assertEquals(Arrays.asList(visit1), storage.userVisits(1, null, null, null, "s1"));

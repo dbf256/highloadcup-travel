@@ -2,7 +2,6 @@ package travel;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
@@ -15,9 +14,7 @@ import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
 
-import static io.netty.handler.codec.http.HttpResponseStatus.*;
 import static io.netty.handler.codec.http.HttpVersion.*;
 import static travel.model.Constants.BUF_SIZE;
 
@@ -29,9 +26,6 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) {
         if (msg instanceof FullHttpRequest) {
             FullHttpRequest request = (FullHttpRequest)msg;
-            //if (HttpUtil.is100ContinueExpected(request)) {
-            //    send100Continue(ctx);
-            //}
             handleRequest(request, ctx);
         }
     }

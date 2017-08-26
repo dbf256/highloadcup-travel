@@ -62,22 +62,8 @@ public class Main {
     public static final Storage storage = new Storage();
 
     public static void main(String[] args) throws Exception {
-
         new Reader().readData(storage);
-        //Handler handler = new Handler(storage);
         new Main(80).run();
     }
 
-    /*
-    public static void main(String[] args) throws Exception {
-        Server server = new Server(80);
-        Storage storage = new Storage();
-        new Reader().readData(storage);
-        Handler handler = new Handler(storage);
-        new Warmup(handler).warmup();
-        server.setHandler(handler);
-        server.start();
-        server.join();
-    }
-    */
 }

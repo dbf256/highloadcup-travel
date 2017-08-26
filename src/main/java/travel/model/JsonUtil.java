@@ -28,22 +28,6 @@ public class JsonUtil {
         }
     }
 
-    public static Long getAsLong(JsonObject object, String field) {
-        JsonElement element = object.get(field);
-        if (element != null && !element.isJsonNull()) {
-            String strElem = element.getAsString();
-            if (StringUtils.isNumeric(strElem) || (strElem.charAt(0) == '-' && StringUtils.isNumeric(strElem.substring(1)))) {
-                return element.getAsLong();
-            } else {
-                throw new IllegalArgumentException();
-            }
-        } else if (element != null && element.isJsonNull()) {
-            throw new IllegalArgumentException();
-        } else {
-            return null;
-        }
-    }
-
     private static boolean isNumeric(String s) {
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);

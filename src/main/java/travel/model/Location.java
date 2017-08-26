@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import java.util.Objects;
 
 import static travel.model.JsonUtil.getAsIntegerPrimitive;
-import static travel.model.JsonUtil.getAsLong;
 
 // {"distance": 6, "city": "Москва", "place": "Набережная", "id": 1, "country": "Аргентина"}
 public class Location {

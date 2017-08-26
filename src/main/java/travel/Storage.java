@@ -5,18 +5,14 @@ import io.netty.buffer.Unpooled;
 import io.netty.util.CharsetUtil;
 import travel.model.Location;
 import travel.model.User;
-import travel.model.UserVisit;
 import travel.model.Visit;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static travel.model.Constants.BUF_SIZE;
 import static travel.model.Constants.INT_FIELD_MISSING;
-import static travel.model.Constants.LONG_FIELD_MISSING;
 
 class Storage {
     public final Map<Integer, User> users = new ConcurrentHashMap<>();
