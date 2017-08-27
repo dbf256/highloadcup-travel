@@ -222,22 +222,9 @@ class Storage {
 
     public Double locationAverage(int locationId, Integer fromDate, Integer toDate, Integer fromAge, Integer toAge, Character gender) {
 
-        long fromTimestamp = 0;
-        if (fromAge != null) {
-            Calendar fromCalendar = Calendar.getInstance();
-            fromCalendar.setTimeInMillis(currentTime.get());
-            fromCalendar.add(Calendar.YEAR, -fromAge);
-            fromTimestamp = fromCalendar.getTimeInMillis() / 1000;
-        }
+        long fromTimestamp = getYearsBackTimestamp(fromAge);
 
-        long toTimestamp = 0;
-
-        if (toAge != null) {
-            Calendar toCalendar = Calendar.getInstance();
-            toCalendar.setTimeInMillis(currentTime.get());
-            toCalendar.add(Calendar.YEAR, -toAge);
-            toTimestamp = toCalendar.getTimeInMillis() / 1000;
-        }
+        long toTimestamp = getYearsBackTimestamp(toAge);
 
         long sum = 0;
         double num = 0;
@@ -271,6 +258,19 @@ class Storage {
         } else {
             return sum / num;
         }
+    }
+
+    private long getYearsBackTimestamp(Integer fromAge) {
+        long fromTimestamp = 0;
+        if (fromAge != null) {
+            Date date = new Date(currentTime.get());
+            date.setYear(date.getYear() - fromAge);
+            //Calendar fromCalendar = Calendar.getInstance();
+            //fromCalendar.setTimeInMillis(currentTime.get());
+            //fromCalendar.add(Calendar.YEAR, -fromAge);
+            fromTimestamp = date.getTime() / 1000;
+        }
+        return fromTimestamp;
     }
 
     public List<Visit> userVisits(int userId, Integer fromDate, Integer toDate, Integer toDistance, String country) {
