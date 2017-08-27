@@ -2,6 +2,7 @@ package travel;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
@@ -87,7 +88,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
         if ("users".equals(entity)) {
             try {
                 User user = Main.storage.getUser(entityId);
-                ByteBuf buf = Unpooled.buffer(BUF_SIZE);
+                ByteBuf buf = ctx.alloc().buffer(BUF_SIZE);//Unpooled.buffer(BUF_SIZE);
                 writeUser(user, buf);
                 writeResult(HttpResponseStatus.OK, buf, ctx, false);
             } catch (StorageNotFoundException e) {
@@ -97,7 +98,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
         } else if ("locations".equals(entity)) {
             try {
                 Location location = Main.storage.getLocation(entityId);
-                ByteBuf buf = Unpooled.buffer(BUF_SIZE);
+                ByteBuf buf = ctx.alloc().buffer(BUF_SIZE);//Unpooled.buffer(BUF_SIZE);
                 writeLocation(location, buf);
                 writeResult(HttpResponseStatus.OK, buf, ctx, false);
             } catch (StorageNotFoundException e) {
@@ -107,7 +108,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
         } else if ("visits".equals(entity)) {
             try {
                 Visit visit = Main.storage.getVisit(entityId);
-                ByteBuf buf = Unpooled.buffer(BUF_SIZE);
+                ByteBuf buf = ctx.alloc().buffer(BUF_SIZE);//Unpooled.buffer(BUF_SIZE);
                 writeVisit(visit, buf);
                 writeResult(HttpResponseStatus.OK, buf, ctx, false);
             } catch (StorageNotFoundException e) {
@@ -384,7 +385,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
     private void writeCode(HttpResponseStatus status, ChannelHandlerContext ctx, boolean close) {
         FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, status, EMPTY_BUFF, false);
         addHeaders(response, close);
-        ctx.writeAndFlush(response);
+        ctx.writeAndFlush(response, ctx.voidPromise());
         //if (close) {
         //    ctx.close();
         //}
@@ -393,7 +394,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
     private void writeResult(HttpResponseStatus status, ByteBuf buffer, ChannelHandlerContext ctx, boolean close) {
         FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, status, buffer, false);
         addHeaders(response, close);
-        ctx.writeAndFlush(response);
+        ctx.writeAndFlush(response, ctx.voidPromise());
         //if (close) {
         //    ctx.close();
         //}
