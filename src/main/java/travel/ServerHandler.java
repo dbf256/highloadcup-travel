@@ -88,7 +88,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
         if ("users".equals(entity)) {
             try {
                 User user = Main.storage.getUser(entityId);
-                ByteBuf buf = ctx.alloc().buffer(BUF_SIZE);//Unpooled.buffer(BUF_SIZE);
+                ByteBuf buf = Unpooled.buffer(BUF_SIZE);
                 writeUser(user, buf);
                 writeResult(HttpResponseStatus.OK, buf, ctx, false);
             } catch (StorageNotFoundException e) {
@@ -98,7 +98,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
         } else if ("locations".equals(entity)) {
             try {
                 Location location = Main.storage.getLocation(entityId);
-                ByteBuf buf = ctx.alloc().buffer(BUF_SIZE);//Unpooled.buffer(BUF_SIZE);
+                ByteBuf buf = Unpooled.buffer(BUF_SIZE);
                 writeLocation(location, buf);
                 writeResult(HttpResponseStatus.OK, buf, ctx, false);
             } catch (StorageNotFoundException e) {
@@ -108,7 +108,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
         } else if ("visits".equals(entity)) {
             try {
                 Visit visit = Main.storage.getVisit(entityId);
-                ByteBuf buf = ctx.alloc().buffer(BUF_SIZE);//Unpooled.buffer(BUF_SIZE);
+                ByteBuf buf = Unpooled.buffer(BUF_SIZE);
                 writeVisit(visit, buf);
                 writeResult(HttpResponseStatus.OK, buf, ctx, false);
             } catch (StorageNotFoundException e) {
