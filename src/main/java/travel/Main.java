@@ -49,7 +49,7 @@ public class Main {
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
                     .channel("unix".equals(os) ? EpollServerSocketChannel.class : NioServerSocketChannel.class)
-                    .childOption(ChannelOption.ALLOCATOR, new PooledByteBufAllocator(false))
+                    .childOption(ChannelOption.ALLOCATOR, new PooledByteBufAllocator(true))
                     .childHandler(new ServerInitializer());
             System.out.println("Started");
             Channel ch = b.bind(port).sync().channel();
