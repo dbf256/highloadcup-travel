@@ -2,7 +2,6 @@ package travel;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
@@ -88,7 +87,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
         if ("users".equals(entity)) {
             try {
                 User user = Main.storage.getUser(entityId);
-                ByteBuf buf = Unpooled.buffer(BUF_SIZE);
+                ByteBuf buf = ctx.alloc().buffer(BUF_SIZE);
                 writeUser(user, buf);
                 writeResult(HttpResponseStatus.OK, buf, ctx, false);
             } catch (StorageNotFoundException e) {
@@ -98,7 +97,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
         } else if ("locations".equals(entity)) {
             try {
                 Location location = Main.storage.getLocation(entityId);
-                ByteBuf buf = Unpooled.buffer(BUF_SIZE);
+                ByteBuf buf = ctx.alloc().buffer(BUF_SIZE);
                 writeLocation(location, buf);
                 writeResult(HttpResponseStatus.OK, buf, ctx, false);
             } catch (StorageNotFoundException e) {
@@ -108,7 +107,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
         } else if ("visits".equals(entity)) {
             try {
                 Visit visit = Main.storage.getVisit(entityId);
-                ByteBuf buf = Unpooled.buffer(BUF_SIZE);
+                ByteBuf buf = ctx.alloc().buffer(BUF_SIZE);
                 writeVisit(visit, buf);
                 writeResult(HttpResponseStatus.OK, buf, ctx, false);
             } catch (StorageNotFoundException e) {
@@ -242,7 +241,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
         try {
             Double average = Main.storage.locationAverage(location.id, fromDate, toDate, fromAge, toAge, gender != null ? gender.charAt(0) : null);
             // {"avg": 2.66}
-            ByteBuf buf = Unpooled.buffer(50);
+            ByteBuf buf = ctx.alloc().buffer(40);
             buf.writeBytes("{\"avg\":".getBytes(CharsetUtil.UTF_8));
             buf.writeBytes(AVG_FORMAT.get().format(average).getBytes(CharsetUtil.UTF_8));
             buf.writeBytes("}".getBytes(CharsetUtil.UTF_8));
@@ -291,7 +290,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
         }
         try {
             List<Visit> visits = Main.storage.userVisits(user.id, fromDate, toDate, toDistance, country);
-            ByteBuf buf = Unpooled.buffer(BUF_SIZE * visits.size());
+            ByteBuf buf = ctx.alloc().buffer(BUF_SIZE * visits.size());
             buf.writeBytes("{\"visits\":[".getBytes(CharsetUtil.UTF_8));
             for (int i = 0; i < visits.size(); i++) {
                 Visit visit = visits.get(i);
@@ -302,7 +301,6 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
             }
             buf.writeBytes("]}".getBytes(CharsetUtil.UTF_8));
             writeResult(HttpResponseStatus.OK, buf, ctx, false);
-
         } catch (StorageNotFoundException e) {
             writeCode(HttpResponseStatus.NOT_FOUND, ctx, false);
             return;

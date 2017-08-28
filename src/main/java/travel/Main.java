@@ -1,7 +1,9 @@
 package travel;
 
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollServerSocketChannel;
@@ -47,6 +49,7 @@ public class Main {
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
                     .channel("unix".equals(os) ? EpollServerSocketChannel.class : NioServerSocketChannel.class)
+                    .childOption(ChannelOption.ALLOCATOR, new PooledByteBufAllocator(false))
                     .childHandler(new ServerInitializer());
             System.out.println("Started");
             Channel ch = b.bind(port).sync().channel();
