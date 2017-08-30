@@ -66,6 +66,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
                 writeCode(HttpResponseStatus.NOT_FOUND, ctx, true);
             }
         }
+        Main.storage.requestsCount.incrementAndGet();
     }
 
     private static final ByteBuf EMPTY_REPLY = Unpooled.copiedBuffer("{}", CharsetUtil.UTF_8);

@@ -55,6 +55,7 @@ public class Main {
             Channel ch = b.bind(port).sync().channel();
             new Warmup().warmup();
             prepare();
+            (new Monitor(storage)).start();
             ch.closeFuture().sync();
         } finally {
             bossGroup.shutdownGracefully();

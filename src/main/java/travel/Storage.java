@@ -9,6 +9,8 @@ import travel.model.Visit;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static travel.model.Constants.BUF_SIZE;
@@ -24,6 +26,10 @@ class Storage {
     public final Map<Long, ByteBuf> userJson = new ConcurrentHashMap<>();
     public final Map<Long, ByteBuf> locationJson = new ConcurrentHashMap<>();
     public final Map<Long, ByteBuf> visitJson = new ConcurrentHashMap<>();
+
+    public final AtomicInteger requestsCount = new AtomicInteger();
+    public final AtomicBoolean secondStageGc = new AtomicBoolean(false);
+    public final AtomicBoolean gcTracker = new AtomicBoolean(false);
 
 
     public final AtomicLong currentTime = new AtomicLong(System.currentTimeMillis());
