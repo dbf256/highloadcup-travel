@@ -243,9 +243,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
             Double average = Main.storage.locationAverage(location.id, fromDate, toDate, fromAge, toAge, gender != null ? gender.charAt(0) : null);
             // {"avg": 2.66}
             ByteBuf buf = ctx.alloc().buffer(40);
-            buf.writeBytes("{\"avg\":".getBytes(CharsetUtil.UTF_8));
-            buf.writeBytes(AVG_FORMAT.get().format(average).getBytes(CharsetUtil.UTF_8));
-            buf.writeBytes("}".getBytes(CharsetUtil.UTF_8));
+            buf.writeCharSequence("{\"avg\":" + AVG_FORMAT.get().format(average) + "}", CharsetUtil.UTF_8);
             writeResult(HttpResponseStatus.OK, buf, ctx, false);
         } catch (StorageNotFoundException e) {
             writeCode(HttpResponseStatus.NOT_FOUND, ctx, false);
@@ -292,15 +290,15 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
         try {
             List<Visit> visits = Main.storage.userVisits(user.id, fromDate, toDate, toDistance, country);
             ByteBuf buf = ctx.alloc().buffer(BUF_SIZE * visits.size());
-            buf.writeBytes("{\"visits\":[".getBytes(CharsetUtil.UTF_8));
+            buf.writeCharSequence("{\"visits\":[", CharsetUtil.UTF_8);
             for (int i = 0; i < visits.size(); i++) {
                 Visit visit = visits.get(i);
                 writeUserVisit(visit, Main.storage.locations.get(visit.location).place, buf);
                 if (i != visits.size() - 1) {
-                    buf.writeBytes(",".getBytes(CharsetUtil.UTF_8));
+                    buf.writeCharSequence(",", CharsetUtil.UTF_8);
                 }
             }
-            buf.writeBytes("]}".getBytes(CharsetUtil.UTF_8));
+            buf.writeCharSequence("]}", CharsetUtil.UTF_8);
             writeResult(HttpResponseStatus.OK, buf, ctx, false);
         } catch (StorageNotFoundException e) {
             writeCode(HttpResponseStatus.NOT_FOUND, ctx, false);
@@ -413,8 +411,8 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
         //buf.writeBytes(BYTES_USER_VISIT_PLACE);
         //buf.writeBytes(visit.place.getBytes(CharsetUtil.UTF_8));
         //buf.writeBytes(BYTES_USER_VISIT_END);
-        buf.writeBytes(
-                ("{\"mark\":" + visit.mark + ",\"visited_at\":" + visit.visited + ",\"place\":\"" + place + "\"}").getBytes(CharsetUtil.UTF_8)
+        buf.writeCharSequence(
+                ("{\"mark\":" + visit.mark + ",\"visited_at\":" + visit.visited + ",\"place\":\"" + place + "\"}"), CharsetUtil.UTF_8
         );
     }
 
@@ -431,10 +429,10 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
 //        buf.writeBytes(String.valueOf(visit.visited).getBytes(CharsetUtil.UTF_8));
 //        buf.writeBytes(BYTES_VISIT_END);
 
-        buf.writeBytes(
-                ("{\"id\":" + visit.id + ",\"location\":" + visit.location + ",\"mark\":" + visit.mark + ",\"user\":" + visit.user +
+        buf.writeCharSequence(
+                "{\"id\":" + visit.id + ",\"location\":" + visit.location + ",\"mark\":" + visit.mark + ",\"user\":" + visit.user +
                         ",\"visited_at\":" + visit.visited + "}"
-                ).getBytes(CharsetUtil.UTF_8)
+               ,CharsetUtil.UTF_8
         );
 
     }
@@ -452,10 +450,10 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
 //        buf.writeBytes(String.valueOf(location.distance).getBytes(CharsetUtil.UTF_8));
 //        buf.writeBytes(BYTES_LOCATION_END);
 
-        buf.writeBytes(
+        buf.writeCharSequence(
                 ("{\"id\":" + location.id + ",\"place\":\"" + location.place + "\",\"country\":\"" + location.country + "\",\"city\":\"" + location.city +
                         "\",\"distance\":" + location.distance + "}"
-                ).getBytes(CharsetUtil.UTF_8)
+                ), CharsetUtil.UTF_8
         );
     }
 
@@ -474,10 +472,10 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
 //        buf.writeBytes(String.valueOf(user.birthDate).getBytes(CharsetUtil.UTF_8));
 //        buf.writeBytes(BYTES_USER_END);
 
-        buf.writeBytes(
-                ("{\"id\":" + user.id + ",\"email\":\"" + user.email + "\",\"first_name\":\"" + user.firstName + "\",\"last_name\":\"" + user.lastName +
-                        "\",\"gender\":\"" + user.gender + "\",\"birth_date\":" + user.birthDate + "}"
-                ).getBytes(CharsetUtil.UTF_8)
+        buf.writeCharSequence(
+                "{\"id\":" + user.id + ",\"email\":\"" + user.email + "\",\"first_name\":\"" + user.firstName + "\",\"last_name\":\"" + user.lastName +
+                        "\",\"gender\":\"" + user.gender + "\",\"birth_date\":" + user.birthDate + "}",
+                CharsetUtil.UTF_8
         );
     }
 
