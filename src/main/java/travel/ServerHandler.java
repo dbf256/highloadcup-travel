@@ -39,21 +39,26 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
         } else {
             target = request.uri().substring(0, pos);
         }
-        String[] parts = target.split("/");
+
         if (request.method().equals(HttpMethod.GET)) {
             // users / 1 / visits
-            if (parts.length == 4 && parts[1].equals("users") && parts[3].startsWith("visits")) {
-                handleVisits(parts[2], request, ctx);
+            if (target.startsWith("/users/") && target.endsWith("/visits")) {
+                handleVisits(target.substring(7, target.length() - 7), request, ctx);
                 // /locations/1/avg
-            } else if (parts.length == 4 && parts[3].startsWith("avg")) {
-                handleAvg(parts[2], request, ctx);
-                // /users/1 /locations/1 /visits/1
-            } else if (parts.length == 3 && ENTITIES.contains(parts[1])) {
-                handleGet(parts[1], parts[2], ctx);
+            } else if (target.startsWith("/locations/") && target.endsWith("/avg")) {
+                handleAvg(target.substring(11, target.length() - 4), request, ctx);
+            // /users/1 /locations/1 /visits/1
+            } else if (target.startsWith("/users/")) {
+                handleGet("users", target.substring(7, target.length()), ctx);
+            } else if (target.startsWith("/locations/")) {
+                handleGet("locations", target.substring(11, target.length()), ctx);
+            } else if (target.startsWith("/visits/")) {
+                handleGet("visits", target.substring(8, target.length()), ctx);
             } else {
                 writeCode(HttpResponseStatus.NOT_FOUND, ctx, false);
             }
         } else {
+            String[] parts = target.split("/");
             // /users/new /locations/new /visits/new
             if (parts.length == 3 && ENTITIES.contains(parts[1]) && parts[2].startsWith("new")) {
                 handleNew(parts[1], request, ctx);
@@ -362,7 +367,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
         }
     }
 
-    private void addHeaders(FullHttpResponse response, boolean close) {
+    private static void addHeaders(FullHttpResponse response, boolean close) {
         response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=UTF-8");
         response.headers().setInt(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
         if (!close) {
@@ -372,13 +377,27 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
         }
     }
 
-    private void writeCode(HttpResponseStatus status, ChannelHandlerContext ctx, boolean close) {
+    private static final FullHttpResponse REPLY_NOT_FOUND_CLOSE = buildReply(HttpResponseStatus.NOT_FOUND, true);
+    private static final FullHttpResponse REPLY_NOT_FOUND_KEEP_ALIVE = buildReply(HttpResponseStatus.NOT_FOUND, false);
+    private static final FullHttpResponse REPLY_BAD_REQUEST_CLOSE = buildReply(HttpResponseStatus.BAD_REQUEST, true);
+    private static final FullHttpResponse REPLY_BAD_REQUEST_KEEP_ALIVE = buildReply(HttpResponseStatus.BAD_REQUEST, false);
+
+    private static FullHttpResponse buildReply(HttpResponseStatus status, boolean close) {
         FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, status, EMPTY_BUFF, false);
         addHeaders(response, close);
-        ctx.writeAndFlush(response, ctx.voidPromise());
-        //if (close) {
-        //    ctx.close();
-        //}
+        return response;
+    }
+    
+    private void writeCode(HttpResponseStatus status, ChannelHandlerContext ctx, boolean close) {
+        if (status.code() == HttpResponseStatus.NOT_FOUND.code() && close) {
+            ctx.writeAndFlush(REPLY_NOT_FOUND_CLOSE, ctx.voidPromise());
+        } else if (status.code() == HttpResponseStatus.NOT_FOUND.code() && !close) {
+            ctx.writeAndFlush(REPLY_NOT_FOUND_KEEP_ALIVE, ctx.voidPromise());
+        } else if (status.code() == HttpResponseStatus.BAD_REQUEST.code() && close) {
+            ctx.writeAndFlush(REPLY_BAD_REQUEST_CLOSE, ctx.voidPromise());
+        } else {
+            ctx.writeAndFlush(REPLY_BAD_REQUEST_KEEP_ALIVE, ctx.voidPromise());
+        }
     }
 
     private void writeResult(HttpResponseStatus status, ByteBuf buffer, ChannelHandlerContext ctx, boolean close) {
