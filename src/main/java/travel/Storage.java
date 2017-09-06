@@ -1,31 +1,23 @@
 package travel;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import io.netty.util.CharsetUtil;
+import com.koloboke.collect.map.hash.HashIntObjMap;
+import com.koloboke.collect.map.hash.HashIntObjMaps;
 import travel.model.Location;
 import travel.model.User;
 import travel.model.Visit;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-
-import static travel.model.Constants.BUF_SIZE;
 import static travel.model.Constants.INT_FIELD_MISSING;
 
 class Storage {
-    public final Map<Integer, User> users = new ConcurrentHashMap<>();
-    public final Map<Integer, Location> locations = new ConcurrentHashMap<>();
-    public final Map<Integer, Visit> visits = new ConcurrentHashMap<>();
-    public final Map<Integer, List<Visit>> visitsByUser = new ConcurrentHashMap<>();
-    public final Map<Integer, List<Visit>> visitsByLocation = new ConcurrentHashMap<>();
-
-    public final Map<Long, ByteBuf> userJson = new ConcurrentHashMap<>();
-    public final Map<Long, ByteBuf> locationJson = new ConcurrentHashMap<>();
-    public final Map<Long, ByteBuf> visitJson = new ConcurrentHashMap<>();
+    public final HashIntObjMap users = HashIntObjMaps.newMutableMap();
+    public final HashIntObjMap locations = HashIntObjMaps.newMutableMap();
+    public final HashIntObjMap visits = HashIntObjMaps.newMutableMap();
+    public final HashIntObjMap visitsByUser = HashIntObjMaps.newMutableMap();
+    public final HashIntObjMap visitsByLocation = HashIntObjMaps.newMutableMap();
 
     public final AtomicInteger requestsCount = new AtomicInteger();
     public final AtomicBoolean secondStageGc = new AtomicBoolean(false);
@@ -34,51 +26,13 @@ class Storage {
 
     public final AtomicLong currentTime = new AtomicLong(System.currentTimeMillis());
 
-    public void clear() {
-        users.clear();
-        locations.clear();
-        visits.clear();
-        visitsByUser.clear();
-        visitsByLocation.clear();
-    }
-
-    public void updateUserJson(Long id, String json) {
-        ByteBuf buf = Unpooled.buffer(BUF_SIZE);
-        buf.writeBytes(json.getBytes(CharsetUtil.UTF_8));
-        userJson.put(id, buf);
-    }
-
-    public void updateLocationJson(Long id, String json) {
-        ByteBuf buf = Unpooled.buffer(BUF_SIZE);
-        buf.writeBytes(json.getBytes(CharsetUtil.UTF_8));
-        locationJson.put(id, buf);
-    }
-
-    public void updateVisitJson(Long id, String json) {
-        ByteBuf buf = Unpooled.buffer(BUF_SIZE);
-        buf.writeBytes(json.getBytes(CharsetUtil.UTF_8));
-        visitJson.put(id, buf);
-    }
-
-    public ByteBuf getUserJson(Long id) {
-        return userJson.get(id);
-    }
-
-    public ByteBuf getVisitJson(Long id) {
-        return visitJson.get(id);
-    }
-
-    public ByteBuf getLocationJson(Long id) {
-        return locationJson.get(id);
-    }
-
 
     public void insert(User user) {
         users.put(user.id, user);
     }
 
     public void update(int id, User update) {
-        User currentUser = users.get(id);
+        User currentUser = (User)users.get(id);
         if (currentUser == null) {
             throw new StorageNotFoundException();
         }
@@ -97,9 +51,6 @@ class Storage {
         if (update.email != null) {
             currentUser.email = update.email;
         }
-        //ByteBuf buf = Unpooled.buffer(BUF_SIZE);
-        //buf.writeBytes(currentUser.toJson().toString().getBytes(CharsetUtil.UTF_8));
-        //userJson.put(id, buf);
     }
 
     public void insert(Location location) {
@@ -107,7 +58,7 @@ class Storage {
     }
 
     public void update(int id, Location update) {
-        Location currentLocation = locations.get(id);
+        Location currentLocation = (Location)locations.get(id);
         if (currentLocation == null) {
             throw new StorageNotFoundException();
         }
@@ -123,9 +74,6 @@ class Storage {
         if (update.place != null) {
             currentLocation.place = update.place;
         }
-        //ByteBuf buf = Unpooled.buffer(BUF_SIZE);
-        //buf.writeBytes(currentLocation.toJson().toString().getBytes(CharsetUtil.UTF_8));
-        //locationJson.put(id, buf);
     }
 
     public void insert(Visit visit) {
@@ -137,8 +85,8 @@ class Storage {
     }
 
     private void addLocationVisit(int visitId, int locationId) {
-        Visit visit = visits.get(visitId);
-        List<Visit> byLocation = visitsByLocation.get(locationId);
+        Visit visit = (Visit)visits.get(visitId);
+        List<Visit> byLocation = (List<Visit>)visitsByLocation.get(locationId);
         if (byLocation == null) {
             byLocation = new ArrayList<>();
             visitsByLocation.put(locationId, byLocation);
@@ -147,8 +95,8 @@ class Storage {
     }
 
     private void addUserVisit(int visitId, int userId) {
-        Visit visit = visits.get(visitId);
-        List<Visit> byUser = visitsByUser.get(userId);
+        Visit visit = (Visit)visits.get(visitId);
+        List<Visit> byUser = (List<Visit>)visitsByUser.get(userId);
         if (byUser == null) {
             byUser = new ArrayList<>();
             visitsByUser.put(userId, byUser);
@@ -157,23 +105,23 @@ class Storage {
     }
 
     private void deleteLocationVisit(int visitId, int locationId) {
-        Visit visit = visits.get(visitId);
-        List<Visit> byLocation = visitsByLocation.get(locationId);
+        Visit visit = (Visit)visits.get(visitId);
+        List<Visit> byLocation = (List<Visit>)visitsByLocation.get(locationId);
         if (byLocation != null) {
             byLocation.remove(visit);
         }
     }
 
     private void deleteUserVisit(int visitId, int userId) {
-        Visit visit = visits.get(visitId);
-        List<Visit> byUser = visitsByUser.get(userId);
+        Visit visit = (Visit)visits.get(visitId);
+        List<Visit> byUser = (List<Visit>)visitsByUser.get(userId);
         if (byUser != null) {
             byUser.remove(visit);
         }
     }
 
     public void update(int id, Visit update) {
-        Visit currentVisit = visits.get(id);
+        Visit currentVisit = (Visit)visits.get(id);
         if (currentVisit == null) {
             throw new StorageNotFoundException();
         }
@@ -203,7 +151,7 @@ class Storage {
     }
 
     public User getUser(int id) {
-        User currentUser = users.get(id);
+        User currentUser = (User)users.get(id);
         if (currentUser == null) {
             throw new StorageNotFoundException();
         }
@@ -211,7 +159,7 @@ class Storage {
     }
 
     public Location getLocation(int id) {
-        Location currentLocation = locations.get(id);
+        Location currentLocation = (Location)locations.get(id);
         if (currentLocation == null) {
             throw new StorageNotFoundException();
         }
@@ -219,7 +167,7 @@ class Storage {
     }
 
     public Visit getVisit(int id) {
-        Visit currentVisit = visits.get(id);
+        Visit currentVisit = (Visit)visits.get(id);
         if (currentVisit == null) {
             throw new StorageNotFoundException();
         }
@@ -234,7 +182,7 @@ class Storage {
 
         long sum = 0;
         double num = 0;
-        for (Visit visit : visitsByLocation.getOrDefault(locationId, Collections.emptyList())) {
+        for (Visit visit : (List<Visit>)visitsByLocation.getOrDefault(locationId, Collections.emptyList())) {
             //Visit visit = visits.get(visitId);
             if (fromDate != null && visit.visited <= fromDate) {
                 continue;
@@ -242,7 +190,7 @@ class Storage {
             if (toDate != null && visit.visited >= toDate) {
                 continue;
             }
-            User visitor = users.get(visit.user);
+            User visitor = (User)users.get(visit.user);
             if (gender != null && (gender != visitor.gender)) {
                 continue;
             }
@@ -281,7 +229,7 @@ class Storage {
 
     public List<Visit> userVisits(int userId, Integer fromDate, Integer toDate, Integer toDistance, String country) {
         List<Visit> userVisits = new ArrayList<>();
-        for (Visit visit : visitsByUser.getOrDefault(userId, Collections.emptyList())) {
+        for (Visit visit : (List<Visit>)visitsByUser.getOrDefault(userId, Collections.emptyList())) {
             //Visit visit = visits.get(visitId);
             if (toDate != null && visit.visited >= toDate) {
                 continue;
@@ -289,7 +237,7 @@ class Storage {
             if (fromDate != null && visit.visited <= fromDate) {
                 continue;
             }
-            Location location = locations.get(visit.location);
+            Location location = (Location)locations.get(visit.location);
             if (country != null) {
                 if (!country.equals(location.country)) {
                     continue;

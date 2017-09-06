@@ -11,9 +11,7 @@ import travel.model.*;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static io.netty.handler.codec.http.HttpVersion.*;
 import static travel.model.Constants.BUF_SIZE;
@@ -71,11 +69,6 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
 
     private static final ByteBuf EMPTY_REPLY = Unpooled.copiedBuffer("{}", CharsetUtil.UTF_8);
     private static final ByteBuf EMPTY_BUFF = Unpooled.EMPTY_BUFFER;
-    private static final byte[] EMPTY_REPLY_BYTES = "{}".getBytes(CharsetUtil.UTF_8);
-
-    //private ByteBuf getEmptyBuff() {
-    //    return Unpooled.copiedBuffer(EMPTY_REPLY_BYTES);
-    //}
 
     private void handleGet(String entity, String id, ChannelHandlerContext ctx) {
         int entityId = 0;
@@ -293,7 +286,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<Object> {
             buf.writeCharSequence("{\"visits\":[", CharsetUtil.UTF_8);
             for (int i = 0; i < visits.size(); i++) {
                 Visit visit = visits.get(i);
-                writeUserVisit(visit, Main.storage.locations.get(visit.location).place, buf);
+                writeUserVisit(visit, ((Location)Main.storage.locations.get(visit.location)).place, buf);
                 if (i != visits.size() - 1) {
                     buf.writeCharSequence(",", CharsetUtil.UTF_8);
                 }
