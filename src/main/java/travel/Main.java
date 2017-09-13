@@ -43,8 +43,8 @@ public class Main {
         // Configure the server.
         String os = getOperatingSystemType();
         System.out.println("Running at: " + os);
-        EventLoopGroup bossGroup = "unix".equals(os) ? new EpollEventLoopGroup() : new NioEventLoopGroup();
-        EventLoopGroup workerGroup = "unix".equals(os) ? new EpollEventLoopGroup() : new NioEventLoopGroup();
+        EventLoopGroup bossGroup = "unix".equals(os) ? new EpollEventLoopGroup(1) : new NioEventLoopGroup();
+        EventLoopGroup workerGroup = "unix".equals(os) ? new EpollEventLoopGroup(3) : new NioEventLoopGroup();
         try {
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
