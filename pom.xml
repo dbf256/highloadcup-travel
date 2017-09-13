@@ -90,6 +90,16 @@
                                     <mainClass>travel.Main</mainClass>
                                 </transformer>
                             </transformers>
+                            <filters>
+                                <filter>
+                                    <artifact>io.netty:netty-all</artifact>
+                                    <excludes>
+                                        <exclude>io/netty/channel/epoll/EpollEventLoop.class</exclude>
+                                        <exclude>io/netty/channel/epoll/EpollEventLoop$1.class</exclude>
+                                        <exclude>io/netty/channel/epoll/EpollEventLoop$2.class</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                         </configuration>
                     </execution>
                 </executions>
